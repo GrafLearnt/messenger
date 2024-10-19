@@ -1,35 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import TabContext from "@mui/lab/TabContext";
+import TabList from "@mui/lab/TabList";
+import TabPanel from "@mui/lab/TabPanel";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import MainPage from "./pages/MainPage";
+import Login from "./pages/Login";
+import GeneratePage from "./pages/GeneratePage";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Link {
+  url: string;
+  label: string;
+  component: JSX.Element;
 }
 
-export default App
+const LINKS: Link[] = [
+  { url: "/messenger/", label: "Home", component: <MainPage /> },
+  { url: "/messenger/login", label: "Login", component: <Login /> },
+  {
+    url: "/messenger/generate",
+    label: "Generate",
+    component: <GeneratePage />,
+  },
+];
+
+function LabTabs() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const tabValueFromUrl = location.pathname || LINKS[0].url;
+
+  const [value, setValue] = React.useState(tabValueFromUrl);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+    navigate(`${newValue}`);
+  };
+
+  React.useEffect(() => {
+    setValue(tabValueFromUrl);
+  }, [location.pathname, tabValueFromUrl]);
+
+  return (
+    <Box sx={{ width: "100%", typography: "body1" }}>
+      <TabContext value={value}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <TabList onChange={handleChange} aria-label="lab API tabs example">
+            {LINKS.map((i, ix) => (
+              <Tab key={ix} label={i.label} value={i.url} />
+            ))}
+          </TabList>
+        </Box>
+        {LINKS.map((i, ix) => (
+          <TabPanel
+            key={ix}
+            value={i.url}
+            sx={{ display: value === i.url ? "block" : "none" }}
+          >
+            {i.label}
+            {i.component}
+          </TabPanel>
+        ))}
+      </TabContext>
+    </Box>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="*" element={<LabTabs />} />
+    </Routes>
+  );
+}
