@@ -3,25 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Container, Typography, Box, Button, Paper } from '@mui/material';
 import { generateKeyPair, encryptData, decryptData } from '../utils';
 import { useLocation } from 'react-router-dom';
+
 const MainPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
   const [input, setInput] = useState(searchParams.get("m")||'');
   const [result, setResult] = useState('');
-  const password = localStorage.getItem('password')
+
   // Check local storage for password and redirect to /login if not found
-  useEffect(() => {
-    const storedPassword = localStorage.getItem('password');
-    if (!storedPassword) {
-      navigate('/login'); // Redirect to /login if no password in localStorage
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   const storedPassword = localStorage.getItem('password');
+  //   if (!storedPassword) {
+  //     navigate('/messenger/login'); // Redirect to /login if no password in localStorage
+  //   }
+  // }, [navigate]);
+
 
   // Function to process input (you can modify this function as needed)
   const processInput = async () => {
-    console.debug(password)
-    console.debug(input)
-    const decrypted = await decryptData(password, input);
+    const privateKey = localStorage.getItem('privateKey');
+    const decrypted = await decryptData(privateKey, input);
     setResult(decrypted);
   };
 

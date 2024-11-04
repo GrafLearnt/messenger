@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
+  const [privateKey, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = (event) => {
+    event.preventDefault();
     localStorage.setItem('login', login);
-    localStorage.setItem('password', password);
-    console.debug(login, password)
-    // alert('Password stored in local storage');
+    localStorage.setItem('privateKey', privateKey);
+    navigate('/messenger/');
   };
 
   return (
     <Container maxWidth="sm">
+      <form>
       <Box
         sx={{
           display: 'flex',
@@ -33,18 +36,22 @@ const Login = () => {
           variant="outlined"
           margin="normal"
           fullWidth
+          required
         />
         <TextField
           type="password"
           name="password"
           label="Password"
-          value={password}
+          value={privateKey}
           onChange={(e) => setPassword(e.target.value)}
           variant="outlined"
           margin="normal"
           fullWidth
+          required
         />
         <Button
+          type="submit"
+          name="submit"
           variant="contained"
           color="primary"
           onClick={handleLogin}
@@ -53,6 +60,7 @@ const Login = () => {
           Submit
         </Button>
       </Box>
+      </form>
     </Container>
   );
 };

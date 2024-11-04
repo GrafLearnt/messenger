@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import { Button, Container, Typography, Box, TextField } from '@mui/material';
-import { generateKeyPair, encryptData, decryptData } from '../utils';
+import React, { useState, useRef } from "react";
+import { Button, Container, Typography, Box, TextField } from "@mui/material";
+import { generateKeyPair, encryptData, decryptData } from "../utils";
+import { useNavigate } from 'react-router-dom';
 
 const GeneratePage = () => {
-  const [publicKey, setPublicKey] = useState('');
-  const [privateKey, setPrivateKey] = useState('');
-  const [message, setMessage] = useState('');
-  const [encryptedMessage, setEncryptedMessage] = useState('');
-  const [decryptedMessage, setDecryptedMessage] = useState('');
+  const [publicKey, setPublicKey] = useState("");
+  const [privateKey, setPrivateKey] = useState("");
+  const [message, setMessage] = useState("");
+  const [encryptedMessage, setEncryptedMessage] = useState("");
+  const [decryptedMessage, setDecryptedMessage] = useState("");
+  const inputRef = useRef(null);
+  const [login, setLogin] = useState("");
+  const navigate = useNavigate();
 
   // Generate Key Pair and display
   const handleGenerateKeys = async () => {
@@ -27,17 +31,44 @@ const GeneratePage = () => {
     const decrypted = await decryptData(privateKey, encryptedMessage);
     setDecryptedMessage(decrypted);
   };
-
+  const copyToClipboard = () => {
+    if (inputRef.current) {
+      navigator.clipboard
+        .writeText(inputRef.current.textContent.replace(/\u200B/g, ""))
+        .then(() => {
+          alert("Copied");
+        });
+    }
+  };
+  const handleLogin = (event) => {
+    event.preventDefault();
+    console.log(login)
+    console.log(publicKey)
+    localStorage.setItem("login", login);
+    localStorage.setItem("publicKey", publicKey);
+    navigate('/messenger/');
+  };
   return (
     <Container maxWidth="md">
+    <form>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          height: '100vh',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          height: "100vh",
         }}
       >
+        <TextField
+          name="login"
+          label="Login"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          required
+        />
         <Typography variant="h4" align="center" gutterBottom>
           Generate RSA Key Pair
         </Typography>
@@ -49,11 +80,12 @@ const GeneratePage = () => {
         >
           Generate Keys
         </Button>
-
         {publicKey && (
           <Box mt={4}>
-            <Typography variant="h6">Public Key</Typography>
+            <Typography variant="h6">Public Key (save this)</Typography>
             <TextField
+              name="password"
+              type="password"
               value={publicKey}
               variant="outlined"
               fullWidth
@@ -62,26 +94,46 @@ const GeneratePage = () => {
               InputProps={{
                 readOnly: true,
               }}
+              ref={inputRef}
+              onClick={copyToClipboard}
+              required
             />
           </Box>
         )}
 
         {privateKey && (
-          <Box mt={4}>
-            <Typography variant="h6">Private Key</Typography>
-            <TextField
-              value={privateKey}
-              variant="outlined"
-              fullWidth
-              multiline
-              rows={4}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-          </Box>
+          <>
+            <Box mt={4}>
+              <Typography variant="h6">
+                Private Key (secretley share with friend)
+              </Typography>
+              <TextField
+                value={privateKey}
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={4}
+                InputProps={{
+                  readOnly: true,
+                }}
+                ref={inputRef}
+                onClick={copyToClipboard}
+              />
+            </Box>
+            <Box mt={4}>
+              <Button
+                type="submit"
+                name="submit"
+                variant="contained"
+                color="primary"
+                onClick={handleLogin}
+                fullWidth
+              >
+                Submit
+              </Button>
+            </Box>
+          </>
         )}
-
         <Box mt={4}>
           <Typography variant="h6">Message to Encrypt</Typography>
           <TextField
@@ -144,6 +196,7 @@ const GeneratePage = () => {
           </Box>
         )}
       </Box>
+    </form>
     </Container>
   );
 };

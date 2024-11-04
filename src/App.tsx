@@ -14,6 +14,8 @@ import {
 import MainPage from "./pages/MainPage";
 import Login from "./pages/Login";
 import GeneratePage from "./pages/GeneratePage";
+import Show from "./pages/Show"
+// export * from "./shorter"
 
 interface Link {
   url: string;
@@ -40,7 +42,7 @@ function LabTabs() {
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
-    navigate(`${newValue}`);
+    navigate(newValue);
   };
 
   React.useEffect(() => {
@@ -57,16 +59,17 @@ function LabTabs() {
             ))}
           </TabList>
         </Box>
+        {/*<Show/>*/}
         {LINKS.map((i, ix) => (
-          <TabPanel
+          <span key={ix} style={{ display: value === i.url ? 'block' : 'none' }}>
+      {/*    <TabPanel
             key={ix}
             value={i.url}
-            sx={{ display: value === i.url ? "block" : "none" }}
-          >
-            {i.label}
+          >*/}
             {i.component}
-          </TabPanel>
-        ))}
+          {/*</TabPanel>*/}
+          </span>
+        ))}      
       </TabContext>
     </Box>
   );
